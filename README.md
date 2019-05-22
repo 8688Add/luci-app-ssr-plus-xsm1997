@@ -1,4 +1,4 @@
-# luci-app-ssr-plus
+# 不可描述的项目
 本项目为基于coolsnowwolf的lede项目中的软件包开发，加入了kumasocks的支持的自用项目。可能存在bug，可能会不稳定。本项目会不定期地同步主线。
 
 原repo：https://github.com/coolsnowwolf/lede
