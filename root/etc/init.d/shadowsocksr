@@ -480,6 +480,10 @@ rules() {
 }
 
 start() { 
+        if [ ! -f "/tmp/ssr_initial" ]; then
+                touch /tmp/ssr_initial
+                sleep 15
+        fi
 	if [ -z "$switch_server" ] ;then
 	GLOBAL_SERVER=$(uci_get_by_type global global_server)
 	else
