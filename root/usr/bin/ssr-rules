@@ -422,18 +422,6 @@ elif [ "$TPROXY" = 2 ]; then
 	: ${LOCAL_PORT:?"You must assign a port for the udp relay server."}
 fi
 
-flush_r
-[ "$?" = 0 ] || loger 3 "Start failed1!"
-fw_rule
-[ "$?" = 0 ] || loger 3 "Start failed2!"
-ipset_r
-[ "$?" = 0 ] || loger 3 "Start failed3!"
-ac_rule
-[ "$?" = 0 ] || loger 3 "Start failed4!"
-tp_rule
-[ "$?" = 0 ] || loger 3 "Start failed5!"
-gen_include
-[ "$?" = 0 ] || loger 3 "Start failed6!"
-gen_include6
-[ "$?" = 0 ] || loger 3 "Start failed7!"
+flush_r && fw_rule && ipset_r && ac_rule && tp_rule && gen_include
+[ "$?" = 0 ] || loger 3 "Start failed!"
 exit $?
