@@ -91,8 +91,11 @@ ipset_r() {
 		$(gen_iplist6 | sed -e "s/^/add ss_spec_wan_ac6 /")
 EOF
 	ipset -N gfwlist hash:net 2>/dev/null
+	for ip in $WAN_FW_IP; do ipset -! add gfwlist $ip ; done
+
 	$IPT -N SS_SPEC_WAN_AC 
 	$IPT -I SS_SPEC_WAN_AC -d $server -j RETURN
+	$IPT -A SS_SPEC_WAN_AC -m set --match-set gfwlist dst -j SS_SPEC_WAN_FW
 	$IPT -A SS_SPEC_WAN_AC -m set --match-set ss_spec_wan_ac dst -j RETURN
 	$IPT -A SS_SPEC_WAN_AC -j SS_SPEC_WAN_FW
 	
@@ -108,6 +111,7 @@ EOF
 	ipset -N gmlan hash:net 2>/dev/null
 	for ip in $LAN_GM_IP; do ipset -! add gmlan $ip ; done
 	$IPT -A SS_SPEC_WAN_AC -m set --match-set gmlan src -m set ! --match-set china dst -j SS_SPEC_WAN_FW	
+	$IPT -A SS_SPEC_WAN_AC -m set --match-set china dst -j RETURN
 	$IPT -I SS_SPEC_WAN_AC -d $server -j RETURN
 	
 	elif [ "$RUNMODE" = "oversea" ] ;then
@@ -205,6 +209,7 @@ tp_rule() {
 	local ipt="iptables -t mangle"
 	$ipt -N SS_SPEC_TPROXY
 	$ipt -A SS_SPEC_TPROXY -p udp --dport 53 -j RETURN
+	$ipt -A SS_SPEC_TPROXY -p udp --dport 443 -j DROP
   $ipt -A SS_SPEC_TPROXY -p udp -d 0.0.0.0/8 -j RETURN
   $ipt -A SS_SPEC_TPROXY -p udp -d 10.0.0.0/8 -j RETURN
   $ipt -A SS_SPEC_TPROXY -p udp -d 127.0.0.0/8 -j RETURN
@@ -219,10 +224,14 @@ tp_rule() {
 		-j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
   
 	if [ "$RUNMODE" = "router" ] ;then
-	$ipt -A SS_SPEC_TPROXY -p udp -m set ! --match-set ss_spec_wan_ac dst \
+	$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set gfwlist dst \
+		-j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
+	$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set ss_spec_wan_ac dst -j RETURN
+	$ipt -A SS_SPEC_TPROXY -p udp \
 		-j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
 	
 	elif [ "$RUNMODE" = "gfw" ] ;then
+	$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set china dst -j RETURN
 	$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set gmlan src -m set ! --match-set china dst \
 		-j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
 	$ipt -A SS_SPEC_TPROXY -p udp -m set  --match-set gfwlist dst \
