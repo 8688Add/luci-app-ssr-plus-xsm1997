@@ -1,7 +1,7 @@
 local ucursor = require "luci.model.uci".cursor()
 local json = require "luci.jsonc"
 local server_section = arg[1]
-local proto = arg[2] 
+local proto = arg[2]
 local local_port = arg[3]
 
 local server = ucursor:get_all("shadowsocksr", server_section)
@@ -21,9 +21,10 @@ local trojan = {
         verify = false,
         verify_hostname = (server.tls == "1") and false or true,
         cert = "",
-        ciper = "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:RSA-AES128-GCM-SHA256:RSA-AES256-GCM-SHA384:RSA-AES128-SHA:RSA-AES256-SHA:RSA-3DES-EDE-SHA",
-        sni = server.tls_host,
-        alpn = {"h2", "http/1.1"},
+        cipher = "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:RSA-AES128-GCM-SHA256:RSA-AES256-GCM-SHA384:RSA-AES128-SHA:RSA-AES256-SHA:RSA-3DES-EDE-SHA",
+	cipher_tls13 = "TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384",      
+	sni = server.tls_host,
+        alpn = {"http/1.1"},
         curve = "",
         reuse_session = true,
         session_ticket = false,
@@ -31,6 +32,7 @@ local trojan = {
         tcp = {
             no_delay = true,
             keep_alive = true,
+            reuse_port = true,
             fast_open = (server.fast_open == "1") and true or false,
             fast_open_qlen = 20
         }
