@@ -11,7 +11,6 @@
 本项目和主线中的有如下不同之处：
 
 + 加入了kumasocks支持。
-+ 默认屏蔽443端口的UDP连接（主要是QUIC协议），在开启UDP代理的情况下，对于Youtube App这类优先QUIC协议的应用，有明显的速度提升。
 + 加入了IPv6代理支持（仅TCP连接），需要让路由器工作在IPv6 NAT模式下。
 
 ### English
@@ -27,5 +26,4 @@ About kumasocks: kumasocks is a light-weighted transparent proxy to SOCKS5 conve
 There are some differencies between this repo and upstream:
 
 + Add support of kumasocks.
-+ Block UDP connection to 443 port by default (mainly QUIC protocol). When UDP proxy is enabled, it will bring remarkable speed-up to Apps like Youtube which prefer QUIC protocol. (In China only)
 + Add support of IPv6 proxy (only TCP). Your router need work on IPv6 NAT mode when using this feature.
